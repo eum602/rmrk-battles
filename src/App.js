@@ -1,23 +1,15 @@
-import logo from './logo.svg';
-import './App.css';
+import React, {useState, useEffect} from "react"
+import RmrkApi from './api/RmrkApi';
+import WalletConnector from './components/PolkadotConnector';
 
 function App() {
+
+  const [account, setAccount] = useState('');
+  
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <WalletConnector onAccountReady={setAccount}/>
+      <RmrkApi account={ account /*"EVPRszrKPmDT5hwGNhnxp2N1LBKrJgTujpay6xmzQDr4RtN"*/}/>
     </div>
   );
 }

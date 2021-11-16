@@ -3,12 +3,17 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@polkadot/api": "^6.8.1",
+    "@polkadot/extension-dapp": "^0.41.1",
+    "@polkadot/util-crypto": "^7.8.2",
     "@testing-library/jest-dom": "^5.11.4",
     "@testing-library/react": "^11.1.0",
     "@testing-library/user-event": "^12.1.10",
+    "axios": "^0.24.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-scripts": "4.0.3",
+    "rmrk-tools": "^2.0.25",
     "web-vitals": "^1.0.1"
   },
   "scripts": {
