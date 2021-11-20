@@ -9,9 +9,6 @@ export default function RMRK2SocketServerConnector(props) {
 
   useEffect(() => {
     const socket = socketIOClient(ENDPOINT)
-    socket.on("otherRoom", data => {
-      console.log("Party to fight ", data )
-    })
 
     //if (props.account) setAccount(props.account);
     setSocket(socket);
@@ -36,19 +33,23 @@ export default function RMRK2SocketServerConnector(props) {
     })
     
     //I Advise in the general room that 'I am in'
-    socket.emit("accountsRoom", props.account);
+    socket.emit("generalNftsRoom", props.account);
 
     //I check if the other has accepted and if so I confirm I want to challenge  (I am the initial challenger) so a new match starts
-    socket.on(props.account+"accept",(hasAccepted ,address) => {
+    socket.on(props.account+"acceptRoom",(hasAccepted ,address) => {
       //TODO: verify this is available to fight
       console.log(`Has the player ${address} accepted?: ${hasAccepted}`)
-      console.log("If the players accetps I will be receiving message about the challenge in 'matchRelayer' listener ...")
+      console.log("If the players accetps I will be receiving message about the challenge in 'matchRelayerRoom' listener ...")
     })
     
     //listen for other who want to challenge me
     const nftId = "myuniqueidentifier" //set it from the nft endpoint
-    socket.on(nftId, address => {
-      console.log("new challenge received from", address)
+    socket.on(nftId, challengerNFTId => {
+      console.log("new challenge received from", challengerNFTId)
+      //elucidate whether accept the challenge or not
+      //show logic to user
+      const amIAccepted = true //false
+      acceptChallenge(amIAccepted, challengerNFTId);
     })
   }
 
@@ -60,12 +61,14 @@ export default function RMRK2SocketServerConnector(props) {
 
   //I notice some is challenging me then I accept that
   const acceptChallenge = (amIAccepted,challenger) => {
-    socket.emit("acceptChallenge", amIAccepted ,props.account, challenger)
+    socket.emit("acceptChallengeRoom", amIAccepted ,props.account, challenger)
+    //listen in the room where contestants are going to exchange messages
+    socket.on("")
   }
 
   const sendMatchMessage = (message,party) => {
     //e.g. message: I choose sccissor
-    socket.emit("matchRelayer", message, props.account, party)
+    socket.emit("matchRelayerRoom", message, props.account, party)
   }
 
 
