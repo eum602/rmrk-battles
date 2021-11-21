@@ -1,11 +1,14 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import socketIOClient from "socket.io-client";
+import RMRKContext from "./context";
 const ENDPOINT = "http://127.0.0.1:4001";
 
+const accountDefault = 'EVPRszrKPmDT5hwGNhnxp2N1LBKrJgTujpay6xmzQDr4RtN' // null
+
 export default function RMRK2SocketServerConnector(props) {
-  const [response, setResponse] = useState("");
-  const [account, setAccount] = useState("");
   const [socket, setSocket] = useState("")
+  const [account, setAccount] = React.useState(null);
+  const value = React.useMemo(() => ({ account, setAccount }), [account]);
 
   useEffect(() => {
     const socket = socketIOClient(ENDPOINT)
@@ -18,13 +21,12 @@ export default function RMRK2SocketServerConnector(props) {
 
   }, []);
 
+  useEffect(() => {
+    sendMyAddress();
+  }, [account]);
+
   const sendMyAddress = () => {
-    if (!props || (props && !props.account))return;
-    if (account === props.account) return;
-    setAccount(prevState => {
-      if (prevState === props.account) return;
-      return props.account;
-    })
+    if (!account) return;
 
     //I listen in the Room where other tokens of my category are
     let kindOfBird = "Founder" //must be dymamically obtained
@@ -33,10 +35,10 @@ export default function RMRK2SocketServerConnector(props) {
     })
     
     //I Advise in the general room that 'I am in'
-    socket.emit("generalNftsRoom", props.account);
+    socket.emit("generalNftsRoom", account);
 
     //I check if the other has accepted and if so I confirm I want to challenge  (I am the initial challenger) so a new match starts
-    socket.on(props.account+"acceptRoom",(hasAccepted ,address) => {
+    socket.on(account+"acceptRoom",(hasAccepted ,address) => {
       //TODO: verify this is available to fight
       console.log(`Has the player ${address} accepted?: ${hasAccepted}`)
       console.log("If the players accetps I will be receiving message about the challenge in 'matchRelayerRoom' listener ...")
@@ -61,7 +63,7 @@ export default function RMRK2SocketServerConnector(props) {
 
   //I notice some is challenging me then I accept that
   const acceptChallenge = (amIAccepted,challenger) => {
-    socket.emit("acceptChallengeRoom", amIAccepted ,props.account, challenger)
+    socket.emit("acceptChallengeRoom", amIAccepted, account, challenger)
     //listen in the room where contestants are going to exchange messages
     socket.on("")
   }
@@ -70,7 +72,6 @@ export default function RMRK2SocketServerConnector(props) {
     //e.g. message: I choose sccissor
     socket.emit("matchRelayerRoom", message, props.account, party)
   }
-
 
   const receiveMatchMessage = (message,party) => {
     //e.g. message = "sccissor"
@@ -81,9 +82,8 @@ export default function RMRK2SocketServerConnector(props) {
   }
 
   return (
-    <p>
-      It's <time dateTime={response}>{response}</time>
-      {sendMyAddress()}
-    </p>
-  );
+    <RMRKContext.Provider value={value}>
+      {props.children}
+    </RMRKContext.Provider>
+  )
 }

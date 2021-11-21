@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from "react"
-import RMRK2SocketServerConnector from "./RMRK2SocketServerConnector";
+import RMRK2SocketServerConnector from "./rmrk2SocketServerConnector";
 
 function Play(props) {
 
@@ -15,7 +15,7 @@ function Play(props) {
           STOP CLIENT
         </button>
         {/* Automatically connect to rmrk-battles server and look for rivals*/}
-        {loadClient ? <RMRK2SocketServerConnector account={props.account} /> : null}
+        {/* {loadClient ? <RMRK2SocketServerConnector account={props.account} /> : null} */}
       </div>
     </div>
   );
