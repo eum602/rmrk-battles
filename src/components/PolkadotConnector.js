@@ -10,23 +10,6 @@ function WalletConnector(props) {
         extensionSetup()
     }, [])
 
-    const extensionSetup = async() => {
-        const extension = await web3Enable("nft-battles");
-        if (extension.length === 0){
-            setError('No extension installed');
-            return;
-        }
-        let ksmAccounts = []
-        const accounts = await web3Accounts()
-        accounts.forEach(account => {
-            let decoded = decodeAddress(account.address);
-            let ksmAddress = encodeAddress(decoded, 2); //ksm: prefix 2
-            ksmAccounts.push(ksmAddress)
-        })
-        if (ksmAccounts.length>0) props.onAccountReady(ksmAccounts[0]);
-        return;
-    };
-
     return (
         <div>
             {
