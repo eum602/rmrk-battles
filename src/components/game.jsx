@@ -61,6 +61,11 @@ const Game = (props) => {
 
     const getAccounts = async () => {
         const _accounts = await extensionSetup();
+        if (! _accounts){
+            setShowAccounts(false)
+            return
+        }
+            
         setAccounts(_accounts.ksmAccounts);
         if(_accounts.state)
             setShowAccounts(true)
@@ -81,6 +86,12 @@ const Game = (props) => {
             return (
                 <div className={classes.getAccount}>
                     <input className={classes.inputButton} type="button" value="Get Accounts" onClick={getAccounts}/>
+
+                    <React.Fragment key={1}>
+                        <input type="text" name={`acct`} onChange={onChangeSelectAccount}/>
+                        <label htmlFor={`acct`}>{"account"}</label><br></br>
+                        <input className={classes.inputButton} type="button" value="Select account" onClick={onSelectAccount}/>
+                    </React.Fragment>
                 </div>
             )
         else if (!account && showAccounts)
@@ -101,7 +112,7 @@ const Game = (props) => {
                 </div>
             )
         else if(account && !showAccounts) {
-            return <NFTSContainer/>
+            return <NFTSContainer onSelectedNftId={props.onSelectedNftId}/>
         }
         else return null;
     }

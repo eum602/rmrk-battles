@@ -40,9 +40,11 @@ const NFTSContainer = (props) => {
     const classes = useStyles();
     const [nfts, setNfts] = React.useState([]);
     const { account } = React.useContext(RMRKContext);
+    const [selectedNftId, setSelectedNftId] = React.useState('');
 
     const load = async () => {
-        const result = await getNFTByOwnerAddress('EVPRszrKPmDT5hwGNhnxp2N1LBKrJgTujpay6xmzQDr4RtN')//account);
+        //const result = await getNFTByOwnerAddress('EVPRszrKPmDT5hwGNhnxp2N1LBKrJgTujpay6xmzQDr4RtN')//account);
+        const result = await getNFTByOwnerAddress(account) //account);
         if(result.state)
             setNfts(result.nfts);
     }
@@ -50,6 +52,10 @@ const NFTSContainer = (props) => {
     useEffect(() => {
         load()
     }, [])
+
+    const onSelectedBird = (_nftId) => {
+        props.onSelectedNftId(_nftId)
+    }
 
     return (
         <div className={classes.container}>
@@ -65,7 +71,13 @@ const NFTSContainer = (props) => {
             <div className={classes.nftsContainer}>
                 {
                     nfts.map((item, i) => 
-                        <NFTSCard key={i} image={item.image} name={item.metadata_name} description={item.metadata_description}/>
+                        <NFTSCard key={i} 
+                            image={item.image} 
+                            name={item.metadata_name} 
+                            description={item.metadata_description}
+                            nftId={item.id}
+                            onSelected={onSelectedBird}
+                         />
                     )
                 }
             </div>
