@@ -24,7 +24,7 @@ const NFTSCard = (props) => {
 
     return (
         <div className={classes.container}>
-            <img className={classes.image} src={props.image}/>
+            <img className={classes.image} src={props.image} onClick={() => props.onSelected(props.nftId)}/>
             <div>
                 <p>{props.name}<br/>{props.description}</p>
             </div>

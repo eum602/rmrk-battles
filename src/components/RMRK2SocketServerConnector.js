@@ -12,73 +12,73 @@ export default function RMRK2SocketServerConnector(props) {
 
   useEffect(() => {
     const socket = socketIOClient(ENDPOINT)
-
-    //if (props.account) setAccount(props.account);
     setSocket(socket);
     // CLEAN UP THE EFFECT
     return () => socket.disconnect();
-    //
-
   }, []);
 
   useEffect(() => {
-    sendMyAddress();
-  }, [account]);
+    startSocketMessagePassingScheme()    
+  },[props.nftId])
 
-  const sendMyAddress = () => {
-    if (!account) return;
+  const startSocketMessagePassingScheme = () => {
+    console.log("Now there is an address!!!!", props.nftId)
+    if (!props.nftId) return;
 
     //I listen in the Room where other tokens of my category are
     let kindOfBird = "Founder" //must be dymamically obtained
-    socket.on(kindOfBird, address => {
-      console.log("new participant entered ", address)
+    socket.on(kindOfBird, nftIdOtherParticipant => {
+      console.log("new participant entered ", nftIdOtherParticipant)
+      //for simplicity we challenge the first one immediately
+      //set partyInChallenge=true // to avoid challenging during an ongoing party
+      challengeSomeone(nftIdOtherParticipant)
     })
-    
-    //I Advise in the general room that 'I am in'
-    socket.emit("generalNftsRoom", account);
 
     //I check if the other has accepted and if so I confirm I want to challenge  (I am the initial challenger) so a new match starts
-    socket.on(account+"acceptRoom",(hasAccepted ,address) => {
+    socket.on(props.nftId+"acceptRoom",(challengedNftIdentifier, hasAccepted) => {
       //TODO: verify this is available to fight
-      console.log(`Has the player ${address} accepted?: ${hasAccepted}`)
+      console.log(`Has the player ${challengedNftIdentifier} accepted?: ${hasAccepted}`)
       console.log("If the players accetps I will be receiving message about the challenge in 'matchRelayerRoom' listener ...")
+      //Allow the user set its first move and send it through 'matchRelayerRoom' --> use "sendMatchMessage" method
     })
     
     //listen for other who want to challenge me
-    const nftId = "myuniqueidentifier" //set it from the nft endpoint
-    socket.on(nftId, challengerNFTId => {
+    socket.on(props.nftId, challengerNFTId => {
       console.log("new challenge received from", challengerNFTId)
       //elucidate whether accept the challenge or not
       //show logic to user
-      const amIAccepted = true //false
+      //set partyInChallenge=true // to avoid challenging during an ongoing party
+      const amIAccepted = true //for simplicity accepting immeadiately
       acceptChallenge(amIAccepted, challengerNFTId);
     })
+
+    //I listen the message coming from the other player during a contest
+    socket.on(props.nftId + "matchMessage", (message, party) => {
+      console.log("player is", party)
+      console.log("the player chose", message)
+    })
+
+    //I Advise in the general room that 'I am in'
+    socket.emit("generalNftsRoom", props.nftId);
   }
 
   //to use to cheallenge other person
   const challengeSomeone = (challengedParticipant) => {
     //Challenge someone
-    socket.emit("challengeRoom", props.account, challengedParticipant)
+    console.log("challenging to: ", challengedParticipant)
+    socket.emit("challengeRoom", props.nftId, challengedParticipant)
   }
 
   //I notice some is challenging me then I accept that
   const acceptChallenge = (amIAccepted,challenger) => {
-    socket.emit("acceptChallengeRoom", amIAccepted, account, challenger)
+    socket.emit("acceptChallengeRoom", amIAccepted, props.nftId, challenger)
     //listen in the room where contestants are going to exchange messages
-    socket.on("")
+    //socket.on("")
   }
 
   const sendMatchMessage = (message,party) => {
     //e.g. message: I choose sccissor
-    socket.emit("matchRelayerRoom", message, props.account, party)
-  }
-
-  const receiveMatchMessage = (message,party) => {
-    //e.g. message = "sccissor"
-    socket.on(props.account + "matchMessage", (message, party) => {
-      console.log("player is", party)
-      console.log("the player chose", message)
-    })
+    socket.emit("matchRelayerRoom", message, props.nftId, party)
   }
 
   return (
