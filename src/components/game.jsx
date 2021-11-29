@@ -86,12 +86,6 @@ const Game = (props) => {
             return (
                 <div className={classes.getAccount}>
                     <input className={classes.inputButton} type="button" value="Get Accounts" onClick={getAccounts}/>
-
-                    <React.Fragment key={1}>
-                        <input type="text" name={`acct`} onChange={onChangeSelectAccount}/>
-                        <label htmlFor={`acct`}>{"account"}</label><br></br>
-                        <input className={classes.inputButton} type="button" value="Select account" onClick={onSelectAccount}/>
-                    </React.Fragment>
                 </div>
             )
         else if (!account && showAccounts)
@@ -101,10 +95,10 @@ const Game = (props) => {
                     <div style={{ backgroundColor: '#0b111c', padding: '2rem' }}>
                     {
                         accounts.map((item, i) => 
-                            <React.Fragment key={i}>
+                            <div style={{padding: '0.5rem 0px'}} key={i}>
                                 <input type="radio" id={`radio-${item}`} name={`radio-${item}`} value={item} onChange={onChangeSelectAccount}/>
                                 <label htmlFor={`radio-${item}`}>{item}</label><br></br>
-                            </React.Fragment>
+                            </div>
                         )
                     }
                     </div>
@@ -112,7 +106,7 @@ const Game = (props) => {
                 </div>
             )
         else if(account && !showAccounts) {
-            return <NFTSContainer onSelectedNftId={props.onSelectedNftId}/>
+            return <NFTSContainer/>
         }
         else return null;
     }
